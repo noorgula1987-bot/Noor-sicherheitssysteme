@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>NOOR Sicherheitssysteme – Bestandsaufnahme</title>
+<style>
+:root {
+  --noor-red: #e20612;
+  --noor-red-dark: #b9000c;
+  --bg: #f5f5f6;
+  --card-bg: #ffffff;
+  --text-main: #090909;
+  --text-sub: #696969;
+  --line: #e3e3e5;
+  --shadow: 0 18px 60px rgba(0,0,0,.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+.navbar {
+  position: sticky;
+  top: 0;
+  height: 88px;
+  width: 100%;
+  padding: 9px 24px;
+  background: rgba(255,255,255,.97);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  backdrop-filter: blur(18px);
+  z-index: 50;
+}
+
+.logoBox {
+  width: 142px;
+  height: 68px;
+  background: #000;
+  border-radius: 11px;
+  padding: 3px;
+  display: grid;
+  place-items: center;
+}
+.logoBox img { width: 100%; height: 100%; object-fit: contain; }
+
+.version {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .14em;
+  padding-right: 20px;
+  border-right: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.nav { display: flex; gap: 4px; overflow-x: auto; }
+.navBtn {
+  border: 0;
+  background: transparent;
+  color: #5e5e61;
+  padding: 10px 13px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+.navBtn:hover { background: #f5f5f6; color: var(--text-main); }
+.navBtn.active { background: var(--noor-red); color: #fff; }
+
+.navRight { margin-left: auto; display: flex; gap: 8px; }
+
+.subHeader {
+  position: sticky;
+  top: 88px;
+  z-index: 40;
+  height: 56px;
+  padding: 9px 28px;
+  background: #050505;
+  color: #fff;
+  border-bottom: 3px solid var(--noor-red);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topTitle b { font-size: 13px; display: block; letter-spacing: .02em; }
+.topTitle span { color: #a9a9ad; font-size: 11px; }
+
+.statusPill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #444;
+  color: #eee;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.statusPill > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--noor-red);
+  box-shadow: 0 0 0 3px rgba(226,6,18,.18);
+}
+
+.content { padding: 32px 30px 70px; max-width: 1540px; width: 100%; margin: auto; }
+.page { display: none; }
+.page.active { display: block; }
+
+.pageHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 3px 0 20px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--line);
+}
+.pageHead h1 { font-size: 30px; letter-spacing: -.04em; margin: 0; }
+.pageHead p { font-size: 13px; color: var(--text-sub); margin: 4px 0 0; }
+
+.fieldHero {
+  min-height: 360px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  display: grid;
+  grid-template-columns: minmax(0,1.25fr) minmax(330px,.75fr);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 34px;
+}
+.fieldHeroCopy { padding: 54px; display: flex; flex-direction: column; justify-content: center; }
+.eyebrow { display: flex; align-items: center; gap: 9px; font-size: 10px; letter-spacing: .18em; font-weight: 850; color: #62686d; }
+.eyebrowDot { width: 7px; height: 7px; background: var(--noor-red); border-radius: 50%; }
+.fieldHero h1 { font-size: clamp(36px,4.5vw,64px); line-height: .95; letter-spacing: -.065em; margin: 22px 0; font-weight: 850; }
+.fieldHero h1 span { color: #8d8d91; font-weight: 650; }
+.fieldHero p { max-width: 760px; font-size: 16px; line-height: 1.65; color: #5c6267; margin: 0; }
+
+.fieldHeroPanel {
+  position: relative;
+  background: #050505;
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.fieldHeroPanel:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(226,6,18,.09) 1px, transparent 1px), linear-gradient(90deg, rgba(226,6,18,.09) 1px, transparent 1px);
+  background-size: 36px 36px;
+  mask-image: linear-gradient(to bottom, #000, transparent 88%);
+}
+
+.scope { width: min(270px, 70%); aspect-ratio: 1; border: 1px solid var(--noor-red); border-radius: 50%; position: relative; }
+.scopeRing { position: absolute; border: 1px solid #641016; border-radius: 50%; inset: 14%; }
+.scopeRing.r2 { inset: 29%; border-color: #951019; }
+.scopeRing.r3 { inset: 43%; border-color: var(--noor-red); }
+.scopeCross { position: absolute; background: #8f1018; }
+.scopeCross.h { height: 1px; left: -16%; right: -16%; top: 50%; }
+.scopeCross.v { width: 1px; top: -16%; bottom: -16%; left: 50%; }
+.scopeCore {
+  position: absolute;
+  inset: 39%;
+  border-radius: 50%;
+  background: var(--noor-red);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: .04em;
+}
+
+.card { background: var(--card-bg); border: 1px solid var(--line); border-radius: 16px; padding: 22px; margin-bottom: 16px; }
+.grid { display: grid; gap: 13px; }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.field label { display: block; font-size: 11px; font-weight: 950; text-transform: uppercase; letter-spacing: .06em; color: #7d8388; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  border: 1px solid #dfe2e5;
+  border-radius: 9px;
+  padding: 12px 13px;
+  outline: none;
+  background: #fafafa;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  background: #fff;
+  border-color: var(--noor-red);
+  box-shadow: 0 0 0 3px rgba(226,6,18,.08);
+}
+
+.btn {
+  border: 0;
+  border-radius: 9px;
+  padding: 11px 17px;
+  font-weight: 900;
+  background: #f0f1f2;
+  color: #1c1f22;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn.primary { background: var(--noor-red); color: #fff; }
+.btn.primary:hover { background: var(--noor-red-dark); }
+.btn.dark { background: #fff; color: #050505; border: 1px solid var(--line); }
+
+.calendarGrid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; }
+.calendarHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.calendarDays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 800; font-size: 12px; color: var(--text-sub); margin-bottom: 8px; }
+.calendarDates { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.calDay {
+  aspect-ratio: 1;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  background: #fafafa;
+  cursor: pointer;
+  position: relative;
+}
+.calDay:hover { border-color: var(--noor-red); background: #fff; }
+.calDay.empty { background: transparent; border: none; cursor: default; }
+.calDay.active { background: var(--noor-red); color: #fff; border-color: var(--noor-red); font-weight: 800; }
+.calDay.hasEvent::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  background: var(--noor-red);
+  border-radius: 50%;
+}
+.calDay.active.hasEvent::after { background: #fff; }
+
+.eventItem {
+  border-left: 3px solid var(--noor-red);
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.eventItem b { display: block; font-size: 12px; color: var(--text-sub); }
+
+@media(max-width:820px){
+  .navbar { height: 76px; padding: 8px 10px; }
+  .logoBox { width: 112px; }
+  .subHeader { top: 76px; }
+  .fieldHero { grid-template-columns: 1fr; }
+  .grid.two, .calendarGrid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="navbar">
+    <div class="logoBox">
+      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='40' viewBox='0 0 100 40'><text x='10' y='25' fill='%23fff' font-weight='bold'>NOOR</text></svg>" alt="Logo">
+    </div>
+    <div class="version">CONSOLE V2.4</div>
+    <nav class="nav">
+      <button class="navBtn active" data-page="home">ÜBERSICHT</button>
+      <button class="navBtn" data-page="calendar">00 KALENDER</button>
+      <button class="navBtn" data-page="customer">01 KUNDE</button>
+      <button class="navBtn" data-page="object">02 OBJEKT</button>
+      <button class="navBtn" data-page="setup">03 AUFBAU</button>
+      <button class="navBtn" data-page="rooms">04 RÄUME</button>
+      <button class="navBtn" data-page="summary">05 ZUSAMMENFASSUNG</button>
+    </nav>
+    <div class="navRight">
+      <button class="btn dark">Speichern</button>
+      <button class="btn primary">Exportieren</button>
+    </div>
+  </header>
+
+  <div class="subHeader">
+    <div class="topTitle">
+      <b>NOOR Security Console</b>
+      <span>Bestandsaufnahme & Projektierung</span>
+    </div>
+    <div class="statusPill">
+      <span></span> LIVE SYSTEM
+    </div>
+  </div>
+
+  <main class="content">
+    
+    <!-- Home -->
+    <section id="page-home" class="page active">
+      <div class="fieldHero">
+        <div class="fieldHeroCopy">
+          <div class="eyebrow"><span class="eyebrowDot"></span> SYSTEM CONSOLE</div>
+          <h1>NOOR <span>Sicherheitssysteme</span></h1>
+          <p>Digitale Bestandsaufnahme, Raumplanung und Komponenten-Erfassung für gewerbliche und private Sicherheitsobjekte.</p>
+          <div style="margin-top: 24px; display: flex; gap: 10px;">
+            <button class="btn primary" onclick="switchPage('calendar')">Termin Buchen</button>
+            <button class="btn dark" onclick="switchPage('customer')">Bestandsaufnahme Starten</button>
+          </div>
+        </div>
+        <div class="fieldHeroPanel">
+          <div class="scope">
+            <div class="scopeRing"></div>
+            <div class="scopeRing r2"></div>
+            <div class="scopeRing r3"></div>
+            <div class="scopeCross h"></div>
+            <div class="scopeCross v"></div>
+            <div class="scopeCore">SEC</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terminkalender -->
+    <section id="page-calendar" class="page">
+      <div class="pageHead">
+        <div>
+          <h1>Terminkalender</h1>
+          <p>Planung von Vor-Ort-Begehungen und Beratungsterminen.</p>
+        </div>
+      </div>
+
+      <div class="calendarGrid">
+        <div class="card">
+          <div class="calendarHeader">
+            <h2 id="calMonthYear" style="font-size: 18px;">Oktober 2026</h2>
+            <div style="display: flex; gap: 6px;">
+              <button class="btn dark" style="padding: 6px 12px;" onclick="prevMonth()">&lt;</button>
+              <button class="btn dark" style="padding: 6px 12px;" onclick="nextMonth()">&gt;</button>
+            </div>
+          </div>
+          <div class="calendarDays">
+            <div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div>
+          </div>
+          <div class="calendarDates" id="calDates"></div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="card">
+            <h3 style="font-size: 15px; margin-bottom: 12px;">Neuen Termin anlegen</h3>
+            <div class="grid" style="gap: 10px;">
+              <div class="field">
+                <label>Datum</label>
+                <input type="date" id="evtDate">
+              </div>
+              <div class="field">
+                <label>Uhrzeit</label>
+                <input type="time" id="evtTime" value="10:00">
+              </div>
+              <div class="field">
+                <label>Termintyp</label>
+                <select id="evtType">
+                  <option>Vor-Ort-Erstbegehung</option>
+                  <option>Wartung & Inspection</option>
+                  <option>Kundenberatung (Online)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>Kunde / Objekt</label>
+                <input type="text" id="evtTitle" placeholder="z. B. Firma Schmidt">
+              </div>
+              <button class="btn primary" style="width: 100%; margin-top: 4px;" onclick="addEvent()">Termin Speichern</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size: 15px; margin-bottom: 12px;">Geplante Termine</h3>
+            <div id="eventList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kunde -->
+    <section id="page-customer" class="page">
+      <div class="pageHead">
+        <div>
+          <h1>Kundenstammdaten</h1>
+          <p>Erfassen Sie hier die Kontaktdaten des Auftraggebers.</p>
+        </div>
+        <button class="btn primary" onclick="switchPage('object')">Weiter zu Objekt &rarr;</button>
+      </div>
+
+      <div class="card">
+        <div class="grid two">
+          <div class="field">
+            <label>Vorname / Firma</label>
+            <input type="text" placeholder="z. B. Muster GmbH">
+          </div>
+          <div class="field">
+            <label>Nachname / Ansprechpartner</label>
+            <input type="text" placeholder="z. B. Max Mustermann">
+          </div>
+          <div class="field">
+            <label>E-Mail Adresse</label>
+            <input type="email" placeholder="kontakt@beispiel.de">
+          </div>
+          <div class="field">
+            <label>Telefonnummer</label>
+            <input type="tel" placeholder="+49 123 456789">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Objekt -->
+    <section id="page-object" class="page">
+      <div class="pageHead">
+        <div>
+          <h1>Objektdaten</h1>
+          <p>Angaben zum zu sichernden Objekt.</p>
+        </div>
+        <button class="btn primary" onclick="switchPage('setup')">Weiter zu Aufbau &rarr;</button>
+      </div>
+
+      <div class="card">
+        <div class="grid two">
+          <div class="field">
+            <label>Objekttyp</label>
+            <select>
+              <option>Gewerbeobjekt / Büro</option>
+              <option>Privatimmobilie / Einfamilienhaus</option>
+              <option>Lagerhalle / Logistik</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Sicherheitsstufe (Klasse)</label>
+            <select>
+              <option>Klasse A (Standard)</option>
+              <option>Klasse B (Erhöht)</option>
+              <option>Klasse C (Hochrisiko)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Aufbau -->
+    <section id="page-setup" class="page">
+      <div class="pageHead">
+        <div>
+          <h1>Aufbau & Systemkomponenten</h1>
+          <p>Erfassung der installierten Hardware, Sensoren und Zentraleinheiten.</p>
+        </div>
+        <button class="btn primary" onclick="switchPage('rooms')">Weiter zu Räume &rarr;</button>
+      </div>
+
+      <div class="card">
+        <div class="grid two">
+          <div class="field">
+            <label>Zentralentyp / Modell</label>
+            <input type="text" placeholder="z. B. NOOR Hybrid-Zentrale X1">
+          </div>
+          <div class="field">
+            <label>Anzahl Bewegungsmelder</label>
+            <input type="number" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Anzahl Tür-/Fensterkontakte</label>
+            <input type="number" placeholder="0">
+          </div>
+          <div class="field">
+            <label>Kamerasysteme / IP-Cams</label>
+            <input type="number" placeholder="0">
+          </div>
+        </div>
+        <div class="field" style="margin-top: 13px;">
+          <label>Besondere Aufbau-Hinweise / Verdrahtung</label>
+          <textarea rows="4" placeholder="z. B. Verkabelung über Bus-System im 1. OG..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- Räume -->
+    <section id="page-rooms" class="page">
+      <div class="pageHead">
+        <div>
+          <h1>Raumerfassung</h1>
+          <p>Detaillierte Erfassung einzelner Räume.</p>
+        </div>
+        <button class="btn primary" onclick="switchPage('summary')">Weiter zur Übersicht &rarr;</button>
+      </div>
+      <div class="card">
+        <div class="field">
+          <label>Raumbezeichnung</label>
+          <input type="text" placeholder="z. B. Eingangsbereich / Serverraum">
+        </div>
+      </div>
+    </section>
+
+    <!-- Zusammenfassung -->
+    <section id="page-summary" class="page">
+      <div class="pageHead">
+        <div>
+          <h1>Zusammenfassung</h1>
+          <p>Abschlussübersicht des Projekts.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p style="color: var(--text-sub);">Projektierung abgeschlossen. Verwenden Sie den Export-Button oben zum Herunterladen.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.navBtn').forEach(b => b.classList.remove('active'));
+
+    const targetPage = document.getElementById('page-' + pageId);
+    if (targetPage) targetPage.classList.add('active');
+
+    const targetBtn = document.querySelector(`.navBtn[data-page="${pageId}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
+  }
+
+  document.querySelectorAll('.navBtn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      switchPage(this.getAttribute('data-page'));
+    });
+  });
+
+  let currentDate = new Date();
+  let events = [
+    { date: '2026-10-15', time: '10:00', title: 'Muster GmbH', type: 'Vor-Ort-Erstbegehung' },
+    { date: '2026-10-20', time: '14:30', title: 'Einfamilienhaus Weber', type: 'Kundenberatung (Online)' }
+  ];
+
+  const monthNames = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
+
+  function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById('calMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    const calDates = document.getElementById('calDates');
+    calDates.innerHTML = '';
+
+    let startingDay = firstDay === 0 ? 6 : firstDay - 1;
+
+    for (let i = 0; i < startingDay; i++) {
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'calDay empty';
+      calDates.appendChild(emptyDiv);
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'calDay';
+      dayDiv.innerText = day;
+
+      const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      if (events.some(e => e.date === dateString)) {
+        dayDiv.classList.add('hasEvent');
+      }
+
+      dayDiv.onclick = () => {
+        document.querySelectorAll('.calDay').forEach(d => d.classList.remove('active'));
+        dayDiv.classList.add('active');
+        document.getElementById('evtDate').value = dateString;
+      };
+
+      calDates.appendChild(dayDiv);
+    }
+    renderEvents();
+  }
+
+  function renderEvents() {
+    const list = document.getElementById('eventList');
+    list.innerHTML = '';
+
+    if (events.length === 0) {
+      list.innerHTML = '<p style="font-size:12px; color:var(--text-sub);">Keine Termine vorhanden.</p>';
+      return;
+    }
+
+    events.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+    events.forEach(e => {
+      const item = document.createElement('div');
+      item.className = 'eventItem';
+      item.innerHTML = `
+        <b>${e.date} um ${e.time} Uhr</b>
+        <strong>${e.title}</strong>
+        <div style="font-size: 11px; color: var(--text-sub);">${e.type}</div>
+      `;
+      list.appendChild(item);
+    });
+  }
+
+  function addEvent() {
+    const date = document.getElementById('evtDate').value;
+    const time = document.getElementById('evtTime').value;
+    const type = document.getElementById('evtType').value;
+    const title = document.getElementById('evtTitle').value;
+
+    if (!date || !title) {
+      alert('Bitte Datum und Kunde/Objekt eingeben.');
+      return;
+    }
+
+    events.push({ date, time, type, title });
+    document.getElementById('evtTitle').value = '';
+    renderCalendar();
+  }
+
+  function prevMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+  }
+
+  function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+  }
+
+  renderCalendar();
+</script>
+
+</body>
+</html>
